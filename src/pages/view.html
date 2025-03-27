@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>查看页面 - HTML-Go</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+      }
+      
+      #error-container {
+        font-family: 'Inter', sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f9f9f9;
+        color: #333;
+      }
+      
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+      }
+      
+      p {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+      }
+      
+      a {
+        background-color: #1a202c;
+        color: white;
+        text-decoration: none;
+        padding: 0.7rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+      
+      a:hover {
+        background-color: #2d3748;
+        transform: translateY(-2px);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="content-container"></div>
+    <div id="error-container" style="display: none;">
+      <h1>404 - 页面未找到</h1>
+      <p>请求的页面不存在。</p>
+      <a href="/">返回首页</a>
+    </div>
+    
+    <script>
+      // 从 URL 获取内容
+      const urlParams = new URLSearchParams(window.location.search);
+      const encodedContent = urlParams.get('content');
+      
+      if (encodedContent) {
+        try {
+          // 解码 HTML 内容
+          const htmlContent = decodeURIComponent(encodedContent);
+          
+          // 显示页面内容
+          document.getElementById('content-container').innerHTML = htmlContent;
+          
+          // 设置页面标题
+          document.title = getPageTitle(htmlContent) || '查看页面 - HTML-Go';
+          
+          console.log('成功显示页面内容');
+        } catch (error) {
+          console.error('解码内容错误:', error);
+          showError();
+        }
+      } else {
+        // 尝试从 localStorage 获取
+        const pageId = urlParams.get('id');
+        
+        if (!pageId) {
+          console.error('未找到页面 ID 或内容');
+          showError();
+          return;
+        }
+        
+        try {
+          // 从 localStorage 获取页面数据
+          const pagesJson = localStorage.getItem('html-go-pages');
+          
+          if (!pagesJson) {
+            console.error('localStorage 中没有页面数据');
+            showError();
+            return;
+          }
+          
+          const pages = JSON.parse(pagesJson);
+          const page = pages[pageId];
+          
+          if (page && page.htmlContent) {
+            // 显示页面内容
+            document.getElementById('content-container').innerHTML = page.htmlContent;
+            document.title = getPageTitle(page.htmlContent) || '查看页面 - HTML-Go';
+            console.log('成功从 localStorage 显示页面内容');
+          } else {
+            console.error('未找到页面内容');
+            showError();
+          }
+        } catch (error) {
+          console.error('获取页面错误:', error);
+          showError();
+        }
+      }
+      
+      function showError() {
+        document.getElementById('content-container').style.display = 'none';
+        document.getElementById('error-container').style.display = 'flex';
+      }
+      
+      function getPageTitle(html) {
+        try {
+          const titleMatch = html.match(/<title>(.*?)<\/title>/i);
+          return titleMatch ? titleMatch[1] : null;
+        } catch (error) {
+          console.error('获取标题错误:', error);
+          return null;
+        }
+      }
+    </script>
+  </body>
+</html>

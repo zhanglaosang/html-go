@@ -1,0 +1,95 @@
+---
+import { getPage } from '../../lib/db.js';
+
+const { id } = Astro.params;
+let htmlContent = '';
+let pageTitle = '查看页面 - HTML-Go';
+let error = null;
+
+try {
+  if (id) {
+    const page = await getPage(id);
+    
+    if (page && page.html_content) {
+      htmlContent = page.html_content;
+      
+      // 尝试提取标题
+      const titleMatch = htmlContent.match(/<title>(.*?)<\/title>/i);
+      if (titleMatch && titleMatch[1]) {
+        pageTitle = titleMatch[1];
+      }
+    } else {
+      error = '未找到页面内容';
+    }
+  } else {
+    error = '缺少页面 ID';
+  }
+} catch (err) {
+  console.error('获取页面错误:', err);
+  error = '加载页面时发生错误';
+}
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{pageTitle}</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+    }
+    
+    #error-container {
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+    }
+    
+    a {
+      background-color: #1a202c;
+      color: white;
+      text-decoration: none;
+      padding: 0.7rem 1.5rem;
+      border-radius: 50px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    
+    a:hover {
+      background-color: #2d3748;
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  {error ? (
+    <div id="error-container">
+      <h1>404 - 页面未找到</h1>
+      <p>{error}</p>
+      <a href="/">返回首页</a>
+    </div>
+  ) : (
+    <Fragment set:html={htmlContent} />
+  )}
+</body>
+</html>

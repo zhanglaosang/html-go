@@ -1,0 +1,9 @@
+-- HTML-Go 数据库架构
+
+-- 页面表
+CREATE TABLE IF NOT EXISTS pages (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  url_id TEXT UNIQUE NOT NULL,
+  html_content TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);

@@ -1,0 +1,13 @@
+name = "html-go"
+compatibility_date = "2023-01-01"
+
+# 配置 Cloudflare Pages
+[site]
+bucket = "./dist"
+pages_build_output_dir = "dist"
+
+# 配置 D1 数据库
+[[d1_databases]]
+binding = "DB"
+database_name = "html-go-db"
+database_id = "your-database-id-here"
