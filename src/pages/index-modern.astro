@@ -1,0 +1,64 @@
+---
+import '../styles/modern-theme.css';
+import ModernBackground from '../components/ModernBackground.astro';
+import ModernThemeToggle from '../components/ModernThemeToggle.astro';
+import ModernHtmlInput from '../components/ModernHtmlInput.astro';
+import ModernResultSection from '../components/ModernResultSection.astro';
+import ErrorToast from '../components/ErrorToast.astro';
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HTML-Go - 简单高效的 HTML 页面生成器</title>
+    
+    <!-- 引入 Tailwind CSS -->
+    <link href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    
+    <!-- 引入 Font Awesome -->
+    <link href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-100-M/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- 引入 Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+  </head>
+  <body class="futuristic-bg">
+    <!-- 动态背景 -->
+    <ModernBackground />
+    
+    <!-- 错误提示Toast -->
+    <ErrorToast />
+    
+    <!-- 主题切换按钮 -->
+    <ModernThemeToggle />
+    
+    <!-- 主要内容区域 -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 relative z-10">
+      <!-- 标题和简介 -->
+      <div class="text-center mb-6">
+        <div class="title-container">
+          <h1 class="cyber-title">HTML-GO</h1>
+        </div>
+        <p class="description-text text-base max-w-2xl mx-auto mt-3">粘贴您的 HTML 代码，生成一个可分享的链接</p>
+      </div>
+      
+      <!-- 主卡片 -->
+      <div class="cyber-card">
+        <!-- 输入区域 -->
+        <div class="p-5">
+          <ModernHtmlInput />
+        </div>
+        
+        <!-- 结果区域 -->
+        <ModernResultSection />
+      </div>
+      
+      <!-- 页脚 -->
+      <div class="text-center mt-4">
+        <p class="footer-text text-xs">HTML-Go &copy; 2025</p>
+      </div>
+    </div>
+  </body>
+</html>

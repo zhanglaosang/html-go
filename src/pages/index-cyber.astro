@@ -1,0 +1,94 @@
+---
+import '../styles/cyber-theme.css';
+import ParticleBackground from '../components/ParticleBackground.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
+import HtmlInput from '../components/HtmlInput.astro';
+import ResultSection from '../components/ResultSection.astro';
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HTML-Go - 简单的 HTML 页面生成器</title>
+    
+    <!-- 引入 Tailwind CSS -->
+    <link href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    
+    <!-- 引入 Font Awesome -->
+    <link href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-100-M/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- 引入 Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+  </head>
+  <body class="futuristic-bg">
+    <!-- 动态背景 -->
+    <ParticleBackground />
+    
+    <!-- 主题切换按钮 -->
+    <ThemeToggle />
+    
+    <!-- 主要内容区域 -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 relative z-10">
+      <!-- 标题和简介 -->
+      <div class="text-center mb-12">
+        <div class="title-container">
+          <h1 class="cyber-title">HTML-GO</h1>
+        </div>
+        <p class="text-lg text-indigo-200 max-w-2xl mx-auto mt-6">粘贴您的 HTML 代码，生成一个可分享的链接</p>
+      </div>
+      
+      <!-- 主卡片 -->
+      <div class="cyber-card">
+        <!-- 错误信息 -->
+        <div class="error-message mx-6 mt-6" id="error-container"></div>
+        
+        <!-- 输入区域 -->
+        <div class="p-6 md:p-8">
+          <HtmlInput />
+        </div>
+        
+        <!-- 结果区域 -->
+        <ResultSection />
+      </div>
+      
+      <!-- 页脚 -->
+      <div class="text-center mt-8">
+        <p class="text-sm text-indigo-300">HTML-Go &copy; 2025</p>
+      </div>
+    </div>
+
+    <script>
+      // 添加打字机效果
+      function typeWriter(element, text, speed = 50) {
+        let i = 0;
+        element.textContent = '';
+        
+        function type() {
+          if (i < text.length) {
+            element.textContent += text.charAt(i);
+            i++;
+            setTimeout(type, speed);
+          }
+        }
+        
+        type();
+      }
+      
+      // 页面加载完成后的动画效果
+      window.addEventListener('load', () => {
+        const htmlInput = document.getElementById('html-input');
+        if (htmlInput) {
+          const placeholder = htmlInput.getAttribute('placeholder');
+          htmlInput.setAttribute('placeholder', '');
+          
+          setTimeout(() => {
+            typeWriter(htmlInput, placeholder, 30);
+          }, 1000);
+        }
+      });
+    </script>
+  </body>
+</html>

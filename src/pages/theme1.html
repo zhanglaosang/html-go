@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTML-Go - 简单高效的 HTML 页面生成器</title>
+  
+  <!-- 引入 Tailwind CSS -->
+  <link href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+  
+  <!-- 引入 Font Awesome -->
+  <link href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-100-M/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  
+  <!-- 引入 Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap');
+    
+    /* 深色主题变量 */
+    :root {
+      --primary: #6366f1;
+      --secondary: #10b981;
+      --accent: #f43f5e;
+      --dark: #0f172a;
+      --light: #f8fafc;
+      --bg-main: rgba(30, 41, 59, 0.8);
+      --bg-input: rgba(15, 23, 42, 0.8);
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.6);
+      --border-color: rgba(99, 102, 241, 0.3);
+      --gradient-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      --grid-color: rgba(99, 102, 241, 0.05);
+      --card-shadow: 0 0 20px rgba(99, 102, 241, 0.1);
+      --button-hover: rgba(99, 102, 241, 0.1);
+      --result-bg: rgba(99, 102, 241, 0.1);
+      --file-drop-bg: rgba(15, 23, 42, 0.5);
+      --error-bg: rgba(244, 63, 94, 0.1);
+      --error-border: #f43f5e;
+      --error-text: #fb7185;
+    }
+    
+    /* 浅色主题变量 */
+    .light-theme {
+      --primary: #4f46e5;
+      --secondary: #059669;
+      --accent: #e11d48;
+      --dark: #f8fafc;
+      --light: #0f172a;
+      --bg-main: rgba(255, 255, 255, 0.9);
+      --bg-input: rgba(241, 245, 249, 0.9);
+      --text-primary: #1e293b;
+      --text-secondary: rgba(15, 23, 42, 0.7);
+      --border-color: rgba(79, 70, 229, 0.3);
+      --gradient-bg: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+      --grid-color: rgba(79, 70, 229, 0.05);
+      --card-shadow: 0 0 20px rgba(79, 70, 229, 0.1);
+      --button-hover: rgba(79, 70, 229, 0.1);
+      --result-bg: rgba(79, 70, 229, 0.1);
+      --file-drop-bg: rgba(241, 245, 249, 0.8);
+      --error-bg: rgba(225, 29, 72, 0.1);
+      --error-border: #e11d48;
+      --error-text: #e11d48;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    /* 全局过渡效果 */
+    body, .cyber-card, .cyber-input, .cyber-btn, .file-drop-area, 
+    .result-section, .result-container, .copy-btn, .cyber-tab,
+    .futuristic-bg, .grid-bg, .particle, .error-message {
+      transition: all 0.3s ease;
+    }
+    
+    body {
+      font-family: 'Noto Sans SC', sans-serif;
+      background-color: var(--dark);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    /* 主题切换按钮 */
+    .theme-toggle {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      z-index: 50;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      background: var(--bg-main);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .theme-toggle:hover {
+      box-shadow: 0 0 15px var(--primary);
+      border-color: var(--primary);
+    }
+    
+    /* 炫酷背景 */
+    .futuristic-bg {
+      position: relative;
+      background: var(--gradient-bg);
+      overflow: hidden;
+    }
+    
+    .futuristic-bg::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: 
+        radial-gradient(circle at 20% 35%, rgba(99, 102, 241, 0.15) 0%, transparent 25%),
+        radial-gradient(circle at 80% 10%, rgba(244, 63, 94, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 40% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 30%);
+      z-index: 0;
+      transition: opacity 0.5s ease;
+    }
+    
+    .light-theme .futuristic-bg::before {
+      opacity: 0.5;
+    }
+    
+    /* 动态网格背景 */
+    .grid-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(var(--grid-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+      background-size: 40px 40px;
+      z-index: 0;
+      perspective: 1000px;
+      transform-style: preserve-3d;
+      animation: gridMove 60s linear infinite;
+    }
+    
+    @keyframes gridMove {
+      0% {
+        transform: rotateX(60deg) translateZ(-100px) translateY(0);
+      }
+      100% {
+        transform: rotateX(60deg) translateZ(-100px) translateY(100px);
+      }
+    }
+    
+    /* 浮动粒子 */
+    .particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      overflow: hidden;
+    }
+    
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.3;
+      animation: float 8s infinite ease-in-out;
+    }
+    
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0) translateX(0);
+      }
+      25% {
+        transform: translateY(-20px) translateX(10px);
+      }
+      50% {
+        transform: translateY(0) translateX(20px);
+      }
+      75% {
+        transform: translateY(20px) translateX(10px);
+      }
+    }
+    
+    /* 动态标题 */
+    .title-container {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .cyber-title {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      font-size: 4rem;
+      letter-spacing: -0.025em;
+      background: linear-gradient(90deg, #6366f1, #f43f5e, #10b981);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: transparent;
+      position: relative;
+      z-index: 2;
+      text-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+      animation: titleGlow 3s infinite alternate;
+    }
+    
+    @keyframes titleGlow {
+      0% {
+        text-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+      }
+      100% {
+        text-shadow: 0 0 20px rgba(99, 102, 241, 0.8), 0 0 30px rgba(99, 102, 241, 0.6);
+      }
+    }
+    
+    .title-container::before {
+      content: "HTML-GO";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      font-size: 4rem;
+      letter-spacing: -0.025em;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(99, 102, 241, 0.3);
+      z-index: 1;
+      transform: translate(4px, 4px);
+      animation: glitchEffect 5s infinite alternate;
+    }
+    
+    @keyframes glitchEffect {
+      0%, 100% {
+        transform: translate(4px, 4px);
+        opacity: 0.3;
+      }
+      25% {
+        transform: translate(-2px, 4px);
+        opacity: 0.5;
+      }
+      50% {
+        transform: translate(4px, -2px);
+        opacity: 0.3;
+      }
+      75% {
+        transform: translate(-2px, -2px);
+        opacity: 0.5;
+      }
+    }
+    
+    /* 未来感卡片 */
+    .cyber-card {
+      background: var(--bg-main);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--card-shadow);
+      position: relative;
+      z-index: 2;
+      overflow: hidden;
+    }
+    
+    .cyber-card:hover {
+      box-shadow: 0 0 30px rgba(var(--primary-rgb), 0.2);
+    }
+    
+    /* 未来感按钮 */
+    .cyber-btn {
+      position: relative;
+      padding: 0.75rem 1.5rem;
+      background: var(--bg-main);
+      color: var(--text-primary);
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .cyber-btn:hover {
+      background: var(--button-hover);
+      border-color: var(--primary);
+    }
+    
+    .cyber-btn-primary {
+      background: linear-gradient(90deg, var(--primary), var(--primary));
+      color: white;
+      border: none;
+    }
+    
+    .cyber-btn-primary:hover {
+      box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.4);
+    }
+    
+    /* 未来感输入框 */
+    .cyber-input {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-family: 'Fira Code', monospace;
+      padding: 1rem;
+      resize: none;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1) inset;
+    }
+    
+    .cyber-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.2);
+    }
+    
+    .cyber-input::placeholder {
+      color: var(--text-secondary);
+    }
+    
+    /* 未来感标签 */
+    .cyber-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 1rem;
+    }
+    
+    .cyber-tab {
+      padding: 0.75rem 1.5rem;
+      color: var(--text-secondary);
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      position: relative;
+      cursor: pointer;
+    }
+    
+    .cyber-tab.active {
+      color: var(--text-primary);
+    }
+    
+    .cyber-tab::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      transition: width 0.3s ease;
+    }
+    
+    .cyber-tab.active::after {
+      width: 100%;
+    }
+    
+    /* 错误消息样式 */
+    .error-message {
+      display: none;
+      padding: 1rem;
+      background: var(--error-bg);
+      border-left: 3px solid var(--error-border);
+      border-radius: 8px;
+      color: var(--error-text);
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+    }
+    
+    /* 结果区域样式 */
+    .result-section {
+      display: none;
+      background: var(--result-bg);
+      border-top: 1px solid var(--border-color);
+      padding: 1.5rem;
+      border-bottom-left-radius: 16px;
+      border-bottom-right-radius: 16px;
+    }
+    
+    .result-container {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.75rem;
+      display: flex;
+      align-items: center;
+    }
+    
+    .result-url {
+      flex-grow: 1;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.875rem;
+      color: var(--text-primary);
+      word-break: break-all;
+    }
+    
+    .copy-btn {
+      background: linear-gradient(90deg, var(--primary), var(--primary));
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-left: 0.75rem;
+      white-space: nowrap;
+    }
+    
+    .copy-btn:hover {
+      box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.4);
+    }
+    
+    /* 文件上传区域样式 */
+    .file-drop-area {
+      border: 2px dashed var(--border-color);
+      border-radius: 8px;
+      background: var(--file-drop-bg);
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .file-drop-area:hover {
+      border-color: var(--primary);
+    }
+    
+    .file-icon {
+      font-size: 2.5rem;
+      color: var(--primary);
+      margin-bottom: 1rem;
+      opacity: 0.6;
+    }
+    
+    .file-drop-message {
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 1px;
+    }
+    
+    .file-drop-hint {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+
+    /* 页脚样式 */
+    .footer-text {
+      color: var(--text-secondary);
+    }
+
+    /* 描述文本 */
+    .description-text {
+      color: var(--text-secondary);
+    }
+  </style>
+</head>
+<body class="futuristic-bg">
+  <!-- 动态背景 -->
+  <div class="grid-bg"></div>
+  <div class="particles" id="particles"></div>
+  
+  <!-- 主题切换按钮 -->
+  <button id="theme-toggle" class="theme-toggle">
+    <i id="theme-icon" class="fas fa-moon"></i>
+  </button>
+  
+  <!-- 主要内容区域 -->
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 relative z-10">
+    <!-- 标题和简介 -->
+    <div class="text-center mb-12">
+      <div class="title-container">
+        <h1 class="cyber-title">HTML-GO</h1>
+      </div>
+      <p class="description-text text-lg max-w-2xl mx-auto mt-6">粘贴您的 HTML 代码，生成一个可分享的链接</p>
+    </div>
+    
+    <!-- 主卡片 -->
+    <div class="cyber-card">
+      <!-- 错误信息 -->
+      <div class="error-message mx-6 mt-6" id="error-container"></div>
+      
+      <!-- 输入区域 -->
+      <div class="p-6 md:p-8">
+        <div class="mb-6">
+          <div class="cyber-tabs">
+            <div class="cyber-tab active" id="code-tab">代码</div>
+            <div class="cyber-tab" id="file-tab">文件</div>
+          </div>
+        </div>
+        
+        <!-- 代码输入 -->
+        <div id="code-input-container">
+          <textarea id="html-input" class="cyber-input w-full h-64" placeholder="在这里粘贴您的 HTML 代码..."></textarea>
+        </div>
+        
+        <!-- 文件上传 -->
+        <div id="file-container" class="hidden">
+          <label for="html-file" class="file-drop-area flex flex-col items-center justify-center h-64">
+            <div class="file-icon">
+              <i class="fas fa-cloud-upload-alt"></i>
+            </div>
+            <p class="file-drop-message"><span class="font-medium" style="color: var(--primary);">点击上传</span> 或拖放文件</p>
+            <p class="file-drop-hint">支持 HTML 文件</p>
+            <input id="html-file" type="file" class="hidden" accept=".html,.htm" />
+          </label>
+          <p id="file-name" class="mt-2 text-sm" style="color: var(--primary);"></p>
+        </div>
+        
+        <!-- 按钮 -->
+        <div class="mt-6 flex justify-end space-x-4">
+          <button id="clear-button" class="cyber-btn cyber-btn-secondary">
+            <i class="fas fa-eraser mr-2"></i>清除
+          </button>
+          <button id="generate-button" class="cyber-btn cyber-btn-primary">
+            <i class="fas fa-link mr-2"></i>生成链接
+          </button>
+        </div>
+      </div>
+      
+      <!-- 结果区域 -->
+      <div id="result-section" class="result-section">
+        <h3 class="text-xl font-bold mb-4 font-orbitron" style="color: var(--primary);">您的链接已生成</h3>
+        <div class="result-container">
+          <div id="result-url" class="result-url"></div>
+          <button id="copy-button" class="copy-btn">复制</button>
+        </div>
+        <p class="mt-4 text-sm" style="color: var(--text-secondary);">此链接可以直接分享给他人访问您的 HTML 页面。</p>
+      </div>
+    </div>
+    
+    <!-- 页脚 -->
+    <div class="text-center mt-8">
+      <p class="footer-text text-sm">HTML-Go &copy; 2025</p>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    // 定义 CSS 变量
+    const cssVars = {
+      primaryRgb: '99, 102, 241', // 深色主题下的主色 RGB 值
+      primaryLightRgb: '79, 70, 229' // 浅色主题下的主色 RGB 值
+    };
+    
+    // 更新 CSS 变量
+    function updateCssVars(isLight) {
+      document.documentElement.style.setProperty(
+        '--primary-rgb', 
+        isLight ? cssVars.primaryLightRgb : cssVars.primaryRgb
+      );
+    }
+    
+    // 初始化 CSS 变量
+    updateCssVars(document.body.classList.contains('light-theme'));
+    
+    // 创建浮动粒子
+    function createParticles() {
+      const container = document.getElementById('particles');
+      const particleCount = 15;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('particle');
+        
+        // 随机大小
+        const size = Math.random() * 6 + 2;
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        
+        // 随机位置
+        const posX = Math.random() * 100;
+        const posY = Math.random() * 100;
+        particle.style.left = `${posX}%`;
+        particle.style.top = `${posY}%`;
+        
+        // 随机颜色
+        const colors = ['#6366f1', '#f43f5e', '#10b981'];
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        particle.style.background = color;
+        
+        // 随机动画延迟
+        const delay = Math.random() * 5;
+        particle.style.animationDelay = `${delay}s`;
+        
+        // 随机动画持续时间
+        const duration = Math.random() * 10 + 10;
+        particle.style.animationDuration = `${duration}s`;
+        
+        container.appendChild(particle);
+      }
+    }
+    
+    // 创建粒子
+    createParticles();
+    
+    // DOM 元素
+    const codeTab = document.getElementById('code-tab');
+    const fileTab = document.getElementById('file-tab');
+    const htmlInput = document.getElementById('html-input');
+    const fileInput = document.getElementById('html-file');
+    const fileContainer = document.getElementById('file-container');
+    const codeInputContainer = document.getElementById('code-input-container');
+    const fileName = document.getElementById('file-name');
+    const clearButton = document.getElementById('clear-button');
+    const generateButton = document.getElementById('generate-button');
+    const resultSection = document.getElementById('result-section');
+    const resultUrl = document.getElementById('result-url');
+    const copyButton = document.getElementById('copy-button');
+    const errorContainer = document.getElementById('error-container');
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    
+    // 主题切换功能
+    // 检查本地存储中的主题设置
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+      document.body.classList.add('light-theme');
+      themeIcon.classList.remove('fa-moon');
+      themeIcon.classList.add('fa-sun');
+      updateCssVars(true);
+    }
+
+    themeToggle.addEventListener('click', () => {
+      // 切换主题类
+      document.body.classList.toggle('light-theme');
+      const isLight = document.body.classList.contains('light-theme');
+      
+      // 切换图标
+      if (isLight) {
+        themeIcon.classList.remove('fa-moon');
+        themeIcon.classList.add('fa-sun');
+        localStorage.setItem('theme', 'light');
+      } else {
+        themeIcon.classList.remove('fa-sun');
+        themeIcon.classList.add('fa-moon');
+        localStorage.setItem('theme', 'dark');
+      }
+      
+      // 更新 CSS 变量
+      updateCssVars(isLight);
+      
+      // 更新粒子颜色
+      updateParticlesForTheme(isLight);
+    });
+    
+    // 根据主题更新粒子颜色
+    function updateParticlesForTheme(isLight) {
+      const particles = document.querySelectorAll('.particle');
+      particles.forEach(particle => {
+        if (isLight) {
+          // 浅色主题下的粒子颜色
+          const colors = ['#4f46e5', '#e11d48', '#059669'];
+          const color = colors[Math.floor(Math.random() * colors.length)];
+          particle.style.background = color;
+          particle.style.opacity = '0.2';
+        } else {
+          // 深色主题下的粒子颜色
+          const colors = ['#6366f1', '#f43f5e', '#10b981'];
+          const color = colors[Math.floor(Math.random() * colors.length)];
+          particle.style.background = color;
+          particle.style.opacity = '0.3';
+        }
+      });
+    }
+    
+    // 点击输入框时清空内容
+    htmlInput.addEventListener('click', function() {
+      if (this.value === this.getAttribute('placeholder')) {
+        this.value = '';
+      }
+    });
+    
+    // 切换输入方式
+    codeTab.addEventListener('click', () => {
+      codeTab.classList.add('active');
+      fileTab.classList.remove('active');
+      codeInputContainer.classList.remove('hidden');
+      fileContainer.classList.add('hidden');
+    });
+    
+    fileTab.addEventListener('click', () => {
+      fileTab.classList.add('active');
+      codeTab.classList.remove('active');
+      fileContainer.classList.remove('hidden');
+      codeInputContainer.classList.add('hidden');
+    });
+    
+    // 文件选择处理
+    fileInput.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        fileName.textContent = `已选择: ${file.name}`;
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          htmlInput.value = e.target.result;
+        };
+        reader.readAsText(file);
+      }
+    });
+    
+    // 清除按钮
+    clearButton.addEventListener('click', () => {
+      htmlInput.value = '';
+      fileInput.value = '';
+      fileName.textContent = '';
+      resultSection.style.display = 'none';
+      errorContainer.style.display = 'none';
+    });
+    
+    // 生成链接
+    generateButton.addEventListener('click', async () => {
+      const htmlContent = htmlInput.value.trim();
+      
+      if (!htmlContent) {
+        showError('请输入 HTML 内容');
+        return;
+      }
+      
+      try {
+        // 添加加载动画
+        generateButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 处理中...';
+        generateButton.disabled = true;
+        
+        // 模拟 API 调用
+        setTimeout(() => {
+          const urlId = Math.random().toString(36).substring(2, 15);
+          const url = `${window.location.origin}/view/${urlId}`;
+          resultUrl.textContent = url;
+          resultSection.style.display = 'block';
+          errorContainer.style.display = 'none';
+          
+          // 恢复按钮状态
+          generateButton.innerHTML = '<i class="fas fa-link mr-2"></i>生成链接';
+          generateButton.disabled = false;
+          
+          // 添加动画效果
+          resultSection.style.animation = 'fadeIn 0.5s ease-out';
+        }, 800);
+      } catch (error) {
+        console.error('生成链接错误:', error);
+        showError('生成链接时发生错误');
+        
+        // 恢复按钮状态
+        generateButton.innerHTML = '<i class="fas fa-link mr-2"></i>生成链接';
+        generateButton.disabled = false;
+      }
+    });
+    
+    // 复制链接
+    copyButton.addEventListener('click', () => {
+      const url = resultUrl.textContent;
+      navigator.clipboard.writeText(url)
+        .then(() => {
+          copyButton.textContent = '已复制';
+          copyButton.style.background = 'linear-gradient(90deg, var(--secondary), var(--secondary))';
+          setTimeout(() => {
+            copyButton.textContent = '复制';
+            copyButton.style.background = 'linear-gradient(90deg, var(--primary), var(--primary))';
+          }, 2000);
+        })
+        .catch((error) => {
+          console.error('复制错误:', error);
+          showError('复制链接失败');
+        });
+    });
+    
+    // 显示错误信息
+    function showError(message) {
+      errorContainer.textContent = message;
+      errorContainer.style.display = 'block';
+    }
+    
+    // 拖放文件功能
+    const dropArea = document.querySelector('.file-drop-area');
+    
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropArea.addEventListener(eventName, highlight, false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, unhighlight, false);
+    });
+    
+    function highlight() {
+      dropArea.style.borderColor = 'var(--primary)';
+      dropArea.style.background = 'var(--button-hover)';
+    }
+    
+    function unhighlight() {
+      dropArea.style.borderColor = 'var(--border-color)';
+      dropArea.style.background = 'var(--file-drop-bg)';
+    }
+    
+    dropArea.addEventListener('drop', handleDrop, false);
+    
+    function handleDrop(e) {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      
+      if (files.length) {
+        fileInput.files = files;
+        const file = files[0];
+        fileName.textContent = `已选择: ${file.name}`;
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          htmlInput.value = e.target.result;
+        };
+        reader.readAsText(file);
+      }
+    }
+    
+    // 添加打字机效果
+    function typeWriter(element, text, speed = 50) {
+      let i = 0;
+      element.textContent = '';
+      element.setAttribute('placeholder', '');
+      
+      function type() {
+        if (i < text.length) {
+          element.setAttribute('placeholder', element.getAttribute('placeholder') + text.charAt(i));
+          i++;
+          setTimeout(type, speed);
+        }
+      }
+      
+      type();
+    }
+    
+    // 页面加载完成后的动画效果
+    window.addEventListener('load', () => {
+      const placeholder = "在这里粘贴您的 HTML 代码...";
+      htmlInput.setAttribute('placeholder', '');
+      
+      setTimeout(() => {
+        typeWriter(htmlInput, placeholder, 30);
+      }, 1000);
+    });
+  </script>
+</body>
+</html>
