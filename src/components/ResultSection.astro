@@ -1,0 +1,94 @@
+---
+---
+<div id="result-section" class="result-section">
+  <h3 class="text-xl font-bold text-indigo-300 mb-4 font-orbitron">您的链接已生成</h3>
+  <div class="result-container">
+    <div id="result-url" class="result-url"></div>
+    <button id="copy-button" class="copy-btn">
+      <i class="fas fa-copy mr-1"></i>复制
+    </button>
+  </div>
+  <p class="mt-4 text-indigo-300 text-sm">此链接可以直接分享给他人访问您的 HTML 页面。</p>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const resultUrl = document.getElementById('result-url');
+    const copyButton = document.getElementById('copy-button');
+    const generateButton = document.getElementById('generate-button');
+    const resultSection = document.getElementById('result-section');
+    const htmlInput = document.getElementById('html-input');
+    const errorContainer = document.getElementById('error-container');
+    
+    // 生成链接
+    if (generateButton) {
+      generateButton.addEventListener('click', async () => {
+        const htmlContent = htmlInput.value.trim();
+        
+        if (!htmlContent) {
+          showError('请输入 HTML 内容');
+          return;
+        }
+        
+        try {
+          // 添加加载动画
+          generateButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 处理中...';
+          generateButton.disabled = true;
+          
+          // 模拟 API 调用
+          setTimeout(() => {
+            const urlId = Math.random().toString(36).substring(2, 15);
+            const url = `${window.location.origin}/view/${urlId}`;
+            resultUrl.textContent = url;
+            resultSection.style.display = 'block';
+            if (errorContainer) {
+              errorContainer.style.display = 'none';
+            }
+            
+            // 恢复按钮状态
+            generateButton.innerHTML = '<i class="fas fa-link mr-2"></i>生成链接';
+            generateButton.disabled = false;
+            
+            // 添加动画效果
+            resultSection.style.animation = 'fadeIn 0.5s ease-out';
+          }, 800);
+        } catch (error) {
+          console.error('生成链接错误:', error);
+          showError('生成链接时发生错误');
+          
+          // 恢复按钮状态
+          generateButton.innerHTML = '<i class="fas fa-link mr-2"></i>生成链接';
+          generateButton.disabled = false;
+        }
+      });
+    }
+    
+    // 复制链接
+    if (copyButton) {
+      copyButton.addEventListener('click', () => {
+        const url = resultUrl.textContent;
+        navigator.clipboard.writeText(url)
+          .then(() => {
+            copyButton.innerHTML = '<i class="fas fa-check mr-1"></i>已复制';
+            copyButton.style.background = 'linear-gradient(90deg, #10b981, #059669)';
+            setTimeout(() => {
+              copyButton.innerHTML = '<i class="fas fa-copy mr-1"></i>复制';
+              copyButton.style.background = 'linear-gradient(90deg, #6366f1, #4f46e5)';
+            }, 2000);
+          })
+          .catch((error) => {
+            console.error('复制错误:', error);
+            showError('复制链接失败');
+          });
+      });
+    }
+    
+    // 显示错误信息
+    function showError(message) {
+      if (errorContainer) {
+        errorContainer.textContent = message;
+        errorContainer.style.display = 'block';
+      }
+    }
+  });
+</script>

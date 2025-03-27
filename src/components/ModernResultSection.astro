@@ -1,0 +1,85 @@
+---
+---
+<div id="result-section" class="result-section">
+  <h3 class="text-lg font-bold mb-3 font-orbitron" style="color: var(--primary);">您的链接已生成</h3>
+  <div class="result-container">
+    <div id="result-url" class="result-url"></div>
+    <div class="action-buttons">
+      <button id="preview-button" class="action-btn preview-btn tooltip" data-tooltip="在新窗口预览">
+        <i class="fas fa-external-link-alt"></i>
+      </button>
+      <button id="copy-button" class="action-btn tooltip" data-tooltip="复制链接">
+        <i class="fas fa-copy"></i>
+      </button>
+    </div>
+  </div>
+  <p class="mt-3 text-xs" style="color: var(--text-secondary);">此链接可以直接分享给他人访问您的 HTML 页面。</p>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const resultSection = document.getElementById('result-section');
+    const resultUrl = document.getElementById('result-url');
+    const copyButton = document.getElementById('copy-button');
+    const previewButton = document.getElementById('preview-button');
+    
+    // 监听结果事件
+    document.addEventListener('htmlGoResult', (e) => {
+      const { url } = e.detail;
+      
+      // 格式化 URL 显示，使其更加用户友好
+      const formattedUrl = formatUrl(url);
+      resultUrl.innerHTML = formattedUrl;
+      
+      // 保存原始 URL 用于复制和预览
+      resultUrl.dataset.originalUrl = url;
+      
+      resultSection.style.display = 'block';
+      resultSection.classList.add('fade-in');
+    });
+    
+    // 格式化 URL 显示
+    function formatUrl(url) {
+      try {
+        const urlObj = new URL(url);
+        const path = urlObj.pathname;
+        const id = path.split('/').pop();
+        
+        // 创建带样式的 URL 显示
+        return `<span class="font-medium" style="color: var(--text-secondary);">${urlObj.origin}</span><span style="color: var(--primary);">/view/</span><span class="font-bold" style="color: var(--accent);">${id}</span>`;
+      } catch (e) {
+        return url; // 如果解析失败，返回原始 URL
+      }
+    }
+    
+    // 复制链接
+    copyButton.addEventListener('click', () => {
+      // 使用原始 URL 进行复制
+      const url = resultUrl.dataset.originalUrl || resultUrl.textContent;
+      navigator.clipboard.writeText(url)
+        .then(() => {
+          copyButton.setAttribute('data-tooltip', '已复制!');
+          copyButton.style.background = 'linear-gradient(90deg, var(--secondary), var(--secondary))';
+          setTimeout(() => {
+            copyButton.setAttribute('data-tooltip', '复制链接');
+            copyButton.style.background = 'linear-gradient(90deg, var(--primary), var(--primary))';
+          }, 2000);
+        })
+        .catch((error) => {
+          console.error('复制错误:', error);
+          if (window.showErrorToast) {
+            window.showErrorToast('复制链接失败');
+          }
+        });
+    });
+    
+    // 预览链接
+    previewButton.addEventListener('click', () => {
+      // 使用原始 URL 进行预览
+      const url = resultUrl.dataset.originalUrl || resultUrl.textContent;
+      if (url) {
+        window.open(url, '_blank');
+      }
+    });
+  });
+</script>

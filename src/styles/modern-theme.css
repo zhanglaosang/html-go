@@ -1,0 +1,541 @@
+/* 深色主题变量 */
+:root {
+  --primary: #6366f1;
+  --secondary: #10b981;
+  --accent: #f43f5e;
+  --dark: #0f172a;
+  --light: #f8fafc;
+  --bg-main: rgba(30, 41, 59, 0.8);
+  --bg-input: rgba(15, 23, 42, 0.8);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --border-color: rgba(99, 102, 241, 0.3);
+  --gradient-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  --grid-color: rgba(99, 102, 241, 0.05);
+  --card-shadow: 0 0 20px rgba(99, 102, 241, 0.1);
+  --button-hover: rgba(99, 102, 241, 0.1);
+  --result-bg: rgba(99, 102, 241, 0.1);
+  --file-drop-bg: rgba(15, 23, 42, 0.5);
+  --error-bg: rgba(244, 63, 94, 0.1);
+  --error-border: #f43f5e;
+  --error-text: #fb7185;
+  --primary-rgb: 99, 102, 241;
+}
+
+/* 浅色主题变量 */
+.light-theme {
+  --primary: #4f46e5;
+  --secondary: #059669;
+  --accent: #e11d48;
+  --dark: #f8fafc;
+  --light: #0f172a;
+  --bg-main: rgba(255, 255, 255, 0.9);
+  --bg-input: rgba(241, 245, 249, 0.9);
+  --text-primary: #1e293b;
+  --text-secondary: rgba(15, 23, 42, 0.7);
+  --border-color: rgba(79, 70, 229, 0.3);
+  --gradient-bg: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  --grid-color: rgba(79, 70, 229, 0.05);
+  --card-shadow: 0 0 20px rgba(79, 70, 229, 0.1);
+  --button-hover: rgba(79, 70, 229, 0.1);
+  --result-bg: rgba(79, 70, 229, 0.1);
+  --file-drop-bg: rgba(241, 245, 249, 0.8);
+  --error-bg: rgba(225, 29, 72, 0.1);
+  --error-border: #e11d48;
+  --error-text: #e11d48;
+  --primary-rgb: 79, 70, 229;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap');
+
+/* 全局过渡效果 */
+body, .cyber-card, .cyber-input, .cyber-btn, .file-drop-area, 
+.result-section, .result-container, .action-btn, .cyber-tab,
+.futuristic-bg, .grid-bg, .particle, .error-toast {
+  transition: all 0.3s ease;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Noto Sans SC', sans-serif;
+  background-color: var(--dark);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* 主题切换按钮 */
+.theme-toggle {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 50;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: var(--bg-main);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.theme-toggle:hover {
+  box-shadow: 0 0 15px var(--primary);
+  border-color: var(--primary);
+}
+
+/* 炫酷背景 */
+.futuristic-bg {
+  position: relative;
+  background: var(--gradient-bg);
+  overflow: hidden;
+}
+
+.futuristic-bg::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: 
+    radial-gradient(circle at 20% 35%, rgba(99, 102, 241, 0.15) 0%, transparent 25%),
+    radial-gradient(circle at 80% 10%, rgba(244, 63, 94, 0.1) 0%, transparent 20%),
+    radial-gradient(circle at 40% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 30%);
+  z-index: 0;
+  transition: opacity 0.5s ease;
+}
+
+.light-theme .futuristic-bg::before {
+  opacity: 0.5;
+}
+
+/* 动态网格背景 */
+.grid-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(var(--grid-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+  background-size: 40px 40px;
+  z-index: 0;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  animation: gridMove 60s linear infinite;
+}
+
+@keyframes gridMove {
+  0% {
+    transform: rotateX(60deg) translateZ(-100px) translateY(0);
+  }
+  100% {
+    transform: rotateX(60deg) translateZ(-100px) translateY(100px);
+  }
+}
+
+/* 浮动粒子 */
+.particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.3;
+  animation: float 8s infinite ease-in-out;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) translateX(0);
+  }
+  25% {
+    transform: translateY(-20px) translateX(10px);
+  }
+  50% {
+    transform: translateY(0) translateX(20px);
+  }
+  75% {
+    transform: translateY(20px) translateX(10px);
+  }
+}
+
+/* 动态标题 */
+.title-container {
+  position: relative;
+  display: inline-block;
+}
+
+.cyber-title {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 3rem;
+  letter-spacing: -0.025em;
+  background: linear-gradient(90deg, #6366f1, #f43f5e, #10b981);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+  position: relative;
+  z-index: 2;
+  text-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+  animation: titleGlow 3s infinite alternate;
+}
+
+@keyframes titleGlow {
+  0% {
+    text-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+  }
+  100% {
+    text-shadow: 0 0 20px rgba(99, 102, 241, 0.8), 0 0 30px rgba(99, 102, 241, 0.6);
+  }
+}
+
+.title-container::before {
+  content: "HTML-GO";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 3rem;
+  letter-spacing: -0.025em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(99, 102, 241, 0.3);
+  z-index: 1;
+  transform: translate(4px, 4px);
+  animation: glitchEffect 5s infinite alternate;
+}
+
+@keyframes glitchEffect {
+  0%, 100% {
+    transform: translate(4px, 4px);
+    opacity: 0.3;
+  }
+  25% {
+    transform: translate(-2px, 4px);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translate(4px, -2px);
+    opacity: 0.3;
+  }
+  75% {
+    transform: translate(-2px, -2px);
+    opacity: 0.5;
+  }
+}
+
+/* 未来感卡片 */
+.cyber-card {
+  background: var(--bg-main);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--card-shadow);
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.cyber-card:hover {
+  box-shadow: 0 0 30px rgba(var(--primary-rgb), 0.2);
+}
+
+/* 未来感按钮 */
+.cyber-btn {
+  position: relative;
+  padding: 0.6rem 1.2rem;
+  background: var(--bg-main);
+  color: var(--text-primary);
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  font-size: 0.8rem;
+}
+
+.cyber-btn:hover {
+  background: var(--button-hover);
+  border-color: var(--primary);
+}
+
+.cyber-btn-primary {
+  background: linear-gradient(90deg, var(--primary), var(--primary));
+  color: white;
+  border: none;
+}
+
+.cyber-btn-primary:hover {
+  box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.4);
+}
+
+/* 未来感输入框 */
+.cyber-input {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-family: 'Fira Code', monospace;
+  padding: 1rem;
+  resize: none;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1) inset;
+}
+
+.cyber-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.2);
+}
+
+.cyber-input::placeholder {
+  color: var(--text-secondary);
+}
+
+/* 未来感标签 */
+.cyber-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 1rem;
+}
+
+.cyber-tab {
+  padding: 0.6rem 1.2rem;
+  color: var(--text-secondary);
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  position: relative;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.cyber-tab.active {
+  color: var(--text-primary);
+}
+
+.cyber-tab::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  transition: width 0.3s ease;
+}
+
+.cyber-tab.active::after {
+  width: 100%;
+}
+
+/* 错误消息样式 - 优雅的Toast提示 */
+.error-toast {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--error-bg);
+  border-left: 3px solid var(--error-border);
+  border-radius: 8px;
+  color: var(--error-text);
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+  transform: translateX(-50%) translateY(-20px);
+  max-width: 90%;
+}
+
+.error-toast.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.error-toast i {
+  margin-right: 0.75rem;
+  font-size: 1rem;
+}
+
+/* 结果区域样式 */
+.result-section {
+  display: none;
+  background: var(--result-bg);
+  border-top: 1px solid var(--border-color);
+  padding: 1.25rem;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+}
+
+.result-container {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.75rem;
+  display: flex;
+  align-items: center;
+}
+
+.result-url {
+  flex-grow: 1;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  word-break: break-all;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: 0.75rem;
+}
+
+.action-btn {
+  background: linear-gradient(90deg, var(--primary), var(--primary));
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.5rem;
+}
+
+.action-btn:hover {
+  box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.4);
+}
+
+.action-btn i {
+  font-size: 0.875rem;
+}
+
+.action-btn.preview-btn {
+  background: linear-gradient(90deg, var(--secondary), var(--secondary));
+}
+
+/* 文件上传区域样式 */
+.file-drop-area {
+  border: 2px dashed var(--border-color);
+  border-radius: 8px;
+  background: var(--file-drop-bg);
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.file-drop-area:hover {
+  border-color: var(--primary);
+}
+
+.file-icon {
+  font-size: 2rem;
+  color: var(--primary);
+  margin-bottom: 0.75rem;
+  opacity: 0.6;
+}
+
+.file-drop-message {
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 1px;
+  font-size: 0.9rem;
+}
+
+.file-drop-hint {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+/* 页脚样式 */
+.footer-text {
+  color: var(--text-secondary);
+}
+
+/* 描述文本 */
+.description-text {
+  color: var(--text-secondary);
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* 工具提示 */
+.tooltip {
+  position: relative;
+}
+
+.tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.tooltip:hover::after {
+  opacity: 1;
+  visibility: visible;
+}

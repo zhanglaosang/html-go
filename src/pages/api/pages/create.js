@@ -15,7 +15,9 @@ export async function post({ request, locals }) {
     
     // 生成随机 URL ID
     const timestamp = new Date().getTime().toString();
-    const urlId = MD5(htmlContent + timestamp).toString();
+    // 使用更短的 ID 格式：6-8位字母数字组合
+    const hash = MD5(htmlContent + timestamp).toString();
+    const urlId = hash.substring(0, 7); // 取前7位作为短ID
     
     // 创建页面
     await createPage(urlId, htmlContent);

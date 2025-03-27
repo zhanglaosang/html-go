@@ -1,0 +1,149 @@
+---
+---
+<div class="mb-6">
+  <div class="cyber-tabs">
+    <div class="cyber-tab active" id="code-tab">代码</div>
+    <div class="cyber-tab" id="file-tab">文件</div>
+  </div>
+</div>
+
+<!-- 代码输入 -->
+<div id="code-input-container">
+  <textarea id="html-input" class="cyber-input w-full h-64" placeholder="在这里粘贴您的 HTML 代码..."></textarea>
+</div>
+
+<!-- 文件上传 -->
+<div id="file-container" class="hidden">
+  <label for="html-file" class="file-drop-area flex flex-col items-center justify-center h-64">
+    <div class="file-icon">
+      <i class="fas fa-cloud-upload-alt"></i>
+    </div>
+    <p class="file-drop-message"><span class="font-medium text-indigo-400">点击上传</span> 或拖放文件</p>
+    <p class="file-drop-hint">支持 HTML 文件</p>
+    <input id="html-file" type="file" class="hidden" accept=".html,.htm" />
+  </label>
+  <p id="file-name" class="mt-2 text-sm text-indigo-300"></p>
+</div>
+
+<!-- 按钮 -->
+<div class="mt-6 flex justify-end space-x-4">
+  <button id="clear-button" class="cyber-btn cyber-btn-secondary">
+    <i class="fas fa-eraser mr-2"></i>清除
+  </button>
+  <button id="generate-button" class="cyber-btn cyber-btn-primary">
+    <i class="fas fa-link mr-2"></i>生成链接
+  </button>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // DOM 元素
+    const codeTab = document.getElementById('code-tab');
+    const fileTab = document.getElementById('file-tab');
+    const htmlInput = document.getElementById('html-input');
+    const fileInput = document.getElementById('html-file');
+    const fileContainer = document.getElementById('file-container');
+    const codeInputContainer = document.getElementById('code-input-container');
+    const fileName = document.getElementById('file-name');
+    const clearButton = document.getElementById('clear-button');
+    const generateButton = document.getElementById('generate-button');
+    const resultSection = document.getElementById('result-section');
+    
+    // 点击输入框时清空内容
+    htmlInput.addEventListener('click', function() {
+      this.value = '';
+    });
+    
+    // 切换输入方式
+    codeTab.addEventListener('click', () => {
+      codeTab.classList.add('active');
+      fileTab.classList.remove('active');
+      codeInputContainer.classList.remove('hidden');
+      fileContainer.classList.add('hidden');
+    });
+    
+    fileTab.addEventListener('click', () => {
+      fileTab.classList.add('active');
+      codeTab.classList.remove('active');
+      fileContainer.classList.remove('hidden');
+      codeInputContainer.classList.add('hidden');
+    });
+    
+    // 文件选择处理
+    fileInput.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        fileName.textContent = `已选择: ${file.name}`;
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          htmlInput.value = e.target.result;
+        };
+        reader.readAsText(file);
+      }
+    });
+    
+    // 清除按钮
+    clearButton.addEventListener('click', () => {
+      htmlInput.value = '';
+      fileInput.value = '';
+      fileName.textContent = '';
+      if (resultSection) {
+        resultSection.style.display = 'none';
+      }
+      const errorContainer = document.getElementById('error-container');
+      if (errorContainer) {
+        errorContainer.style.display = 'none';
+      }
+    });
+    
+    // 拖放文件功能
+    const dropArea = document.querySelector('.file-drop-area');
+    
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropArea.addEventListener(eventName, highlight, false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, unhighlight, false);
+    });
+    
+    function highlight() {
+      dropArea.style.borderColor = 'rgba(99, 102, 241, 0.8)';
+      dropArea.style.background = 'rgba(99, 102, 241, 0.1)';
+    }
+    
+    function unhighlight() {
+      dropArea.style.borderColor = 'rgba(99, 102, 241, 0.3)';
+      dropArea.style.background = 'rgba(15, 23, 42, 0.5)';
+    }
+    
+    dropArea.addEventListener('drop', handleDrop, false);
+    
+    function handleDrop(e) {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      
+      if (files.length) {
+        fileInput.files = files;
+        const file = files[0];
+        fileName.textContent = `已选择: ${file.name}`;
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          htmlInput.value = e.target.result;
+        };
+        reader.readAsText(file);
+      }
+    }
+  });
+</script>

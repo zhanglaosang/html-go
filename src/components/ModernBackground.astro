@@ -1,0 +1,73 @@
+---
+---
+<div class="grid-bg"></div>
+<div class="particles" id="particles"></div>
+
+<script>
+  // 创建浮动粒子
+  function createParticles() {
+    const container = document.getElementById('particles');
+    const particleCount = 15;
+    
+    for (let i = 0; i < particleCount; i++) {
+      const particle = document.createElement('div');
+      particle.classList.add('particle');
+      
+      // 随机大小
+      const size = Math.random() * 6 + 2;
+      particle.style.width = `${size}px`;
+      particle.style.height = `${size}px`;
+      
+      // 随机位置
+      const posX = Math.random() * 100;
+      const posY = Math.random() * 100;
+      particle.style.left = `${posX}%`;
+      particle.style.top = `${posY}%`;
+      
+      // 随机颜色
+      const colors = ['#6366f1', '#f43f5e', '#10b981'];
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      particle.style.background = color;
+      
+      // 随机动画延迟
+      const delay = Math.random() * 5;
+      particle.style.animationDelay = `${delay}s`;
+      
+      // 随机动画持续时间
+      const duration = Math.random() * 10 + 10;
+      particle.style.animationDuration = `${duration}s`;
+      
+      container.appendChild(particle);
+    }
+  }
+  
+  // 根据主题更新粒子颜色
+  function updateParticlesForTheme(isLight) {
+    const particles = document.querySelectorAll('.particle');
+    particles.forEach(particle => {
+      if (isLight) {
+        // 浅色主题下的粒子颜色
+        const colors = ['#4f46e5', '#e11d48', '#059669'];
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        particle.style.background = color;
+        particle.style.opacity = '0.2';
+      } else {
+        // 深色主题下的粒子颜色
+        const colors = ['#6366f1', '#f43f5e', '#10b981'];
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        particle.style.background = color;
+        particle.style.opacity = '0.3';
+      }
+    });
+  }
+  
+  // 页面加载时创建粒子
+  document.addEventListener('DOMContentLoaded', () => {
+    createParticles();
+    
+    // 监听主题变化事件
+    document.addEventListener('themeChanged', (e) => {
+      updateParticlesForTheme(e.detail.isLight);
+    });
+  });
+</script>

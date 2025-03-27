@@ -1,0 +1,39 @@
+---
+---
+<div class="theme-toggle" id="theme-toggle">
+  <i id="theme-icon" class="fas fa-moon"></i>
+</div>
+
+<script>
+  // 主题切换功能
+  document.addEventListener('DOMContentLoaded', () => {
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    const body = document.body;
+    
+    // 创建自定义事件
+    const themeChangedEvent = new Event('themeChanged');
+    
+    // 检查本地存储中的主题偏好
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+      body.classList.add('light-theme');
+      themeIcon.classList.replace('fa-moon', 'fa-sun');
+    }
+    
+    themeToggle.addEventListener('click', () => {
+      body.classList.toggle('light-theme');
+      
+      if (body.classList.contains('light-theme')) {
+        themeIcon.classList.replace('fa-moon', 'fa-sun');
+        localStorage.setItem('theme', 'light');
+      } else {
+        themeIcon.classList.replace('fa-sun', 'fa-moon');
+        localStorage.setItem('theme', 'dark');
+      }
+      
+      // 触发主题变化事件
+      document.dispatchEvent(themeChangedEvent);
+    });
+  });
+</script>

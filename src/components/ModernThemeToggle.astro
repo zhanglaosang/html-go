@@ -1,0 +1,59 @@
+---
+---
+<button id="theme-toggle" class="theme-toggle tooltip" data-tooltip="切换主题">
+  <i id="theme-icon" class="fas fa-moon"></i>
+</button>
+
+<script>
+  // 更新 CSS 变量
+  function updateCssVars(isLight) {
+    document.documentElement.style.setProperty(
+      '--primary-rgb', 
+      isLight ? '79, 70, 229' : '99, 102, 241'
+    );
+  }
+  
+  // 主题切换功能
+  document.addEventListener('DOMContentLoaded', () => {
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    const body = document.body;
+    
+    // 检查本地存储中的主题设置
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+      body.classList.add('light-theme');
+      themeIcon.classList.remove('fa-moon');
+      themeIcon.classList.add('fa-sun');
+      updateCssVars(true);
+    } else {
+      updateCssVars(false);
+    }
+    
+    themeToggle.addEventListener('click', () => {
+      // 切换主题类
+      body.classList.toggle('light-theme');
+      const isLight = body.classList.contains('light-theme');
+      
+      // 切换图标
+      if (isLight) {
+        themeIcon.classList.remove('fa-moon');
+        themeIcon.classList.add('fa-sun');
+        localStorage.setItem('theme', 'light');
+      } else {
+        themeIcon.classList.remove('fa-sun');
+        themeIcon.classList.add('fa-moon');
+        localStorage.setItem('theme', 'dark');
+      }
+      
+      // 更新 CSS 变量
+      updateCssVars(isLight);
+      
+      // 触发主题变化事件
+      const themeChangedEvent = new CustomEvent('themeChanged', {
+        detail: { isLight }
+      });
+      document.dispatchEvent(themeChangedEvent);
+    });
+  });
+</script>

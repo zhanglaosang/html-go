@@ -1,0 +1,231 @@
+---
+---
+<div class="mb-3">
+  <div class="cyber-tabs">
+    <div class="cyber-tab active" id="code-tab">代码</div>
+    <div class="cyber-tab" id="file-tab">文件</div>
+  </div>
+</div>
+
+<!-- 代码输入 -->
+<div id="code-input-container">
+  <textarea id="html-input" class="cyber-input w-full h-48" placeholder="在这里粘贴您的 HTML 代码..."></textarea>
+</div>
+
+<!-- 文件上传 -->
+<div id="file-container" class="hidden">
+  <label for="html-file" class="file-drop-area flex flex-col items-center justify-center h-48">
+    <div class="file-icon">
+      <i class="fas fa-cloud-upload-alt"></i>
+    </div>
+    <p class="file-drop-message"><span class="font-medium" style="color: var(--primary);">点击上传</span> 或拖放文件</p>
+    <p class="file-drop-hint">支持 HTML 文件</p>
+    <input id="html-file" type="file" class="hidden" accept=".html,.htm" />
+  </label>
+  <p id="file-name" class="mt-2 text-sm" style="color: var(--primary);"></p>
+</div>
+
+<!-- 按钮 -->
+<div class="mt-4 flex justify-end space-x-3">
+  <button id="clear-button" class="cyber-btn cyber-btn-secondary tooltip" data-tooltip="清空内容">
+    <i class="fas fa-eraser mr-1"></i>清除
+  </button>
+  <button id="generate-button" class="cyber-btn cyber-btn-primary tooltip" data-tooltip="生成分享链接">
+    <i class="fas fa-link mr-1"></i>生成链接
+  </button>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // DOM 元素
+    const codeTab = document.getElementById('code-tab');
+    const fileTab = document.getElementById('file-tab');
+    const htmlInput = document.getElementById('html-input');
+    const fileInput = document.getElementById('html-file');
+    const fileContainer = document.getElementById('file-container');
+    const codeInputContainer = document.getElementById('code-input-container');
+    const fileName = document.getElementById('file-name');
+    const clearButton = document.getElementById('clear-button');
+    const generateButton = document.getElementById('generate-button');
+    const resultSection = document.getElementById('result-section');
+    
+    // 点击输入框时清空内容
+    htmlInput.addEventListener('click', function() {
+      if (this.value === this.getAttribute('placeholder')) {
+        this.value = '';
+      }
+    });
+    
+    // 切换输入方式
+    codeTab.addEventListener('click', () => {
+      codeTab.classList.add('active');
+      fileTab.classList.remove('active');
+      codeInputContainer.classList.remove('hidden');
+      fileContainer.classList.add('hidden');
+    });
+    
+    fileTab.addEventListener('click', () => {
+      fileTab.classList.add('active');
+      codeTab.classList.remove('active');
+      fileContainer.classList.remove('hidden');
+      codeInputContainer.classList.add('hidden');
+    });
+    
+    // 文件选择处理
+    fileInput.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        fileName.textContent = `已选择: ${file.name}`;
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          htmlInput.value = e.target.result;
+        };
+        reader.readAsText(file);
+      }
+    });
+    
+    // 清除按钮
+    clearButton.addEventListener('click', () => {
+      htmlInput.value = '';
+      fileInput.value = '';
+      fileName.textContent = '';
+      if (resultSection) {
+        resultSection.style.display = 'none';
+      }
+      if (window.hideErrorToast) {
+        window.hideErrorToast();
+      }
+    });
+    
+    // 生成链接
+    generateButton.addEventListener('click', async () => {
+      const htmlContent = htmlInput.value.trim();
+      
+      if (!htmlContent) {
+        if (window.showErrorToast) {
+          window.showErrorToast('请输入 HTML 内容');
+        }
+        return;
+      }
+      
+      try {
+        // 添加加载动画
+        generateButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 处理中...';
+        generateButton.disabled = true;
+        
+        // 调用 API 生成链接
+        const response = await fetch('/api/pages/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ htmlContent }),
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          const url = `${window.location.origin}/view/${data.urlId}`;
+          
+          // 触发结果事件
+          const resultEvent = new CustomEvent('htmlGoResult', {
+            detail: { url }
+          });
+          document.dispatchEvent(resultEvent);
+        } else {
+          throw new Error(data.error || '生成链接失败');
+        }
+        
+        // 恢复按钮状态
+        generateButton.innerHTML = '<i class="fas fa-link mr-1"></i>生成链接';
+        generateButton.disabled = false;
+      } catch (error) {
+        console.error('生成链接错误:', error);
+        if (window.showErrorToast) {
+          window.showErrorToast('生成链接时发生错误');
+        }
+        
+        // 恢复按钮状态
+        generateButton.innerHTML = '<i class="fas fa-link mr-1"></i>生成链接';
+        generateButton.disabled = false;
+      }
+    });
+    
+    // 拖放文件功能
+    const dropArea = document.querySelector('.file-drop-area');
+    
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropArea.addEventListener(eventName, highlight, false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, unhighlight, false);
+    });
+    
+    function highlight() {
+      dropArea.style.borderColor = 'var(--primary)';
+      dropArea.style.background = 'var(--button-hover)';
+    }
+    
+    function unhighlight() {
+      dropArea.style.borderColor = 'var(--border-color)';
+      dropArea.style.background = 'var(--file-drop-bg)';
+    }
+    
+    dropArea.addEventListener('drop', handleDrop, false);
+    
+    function handleDrop(e) {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      
+      if (files.length) {
+        fileInput.files = files;
+        const file = files[0];
+        fileName.textContent = `已选择: ${file.name}`;
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          htmlInput.value = e.target.result;
+        };
+        reader.readAsText(file);
+      }
+    }
+    
+    // 添加打字机效果
+    function typeWriter(element, text, speed = 50) {
+      let i = 0;
+      element.textContent = '';
+      element.setAttribute('placeholder', '');
+      
+      function type() {
+        if (i < text.length) {
+          element.setAttribute('placeholder', element.getAttribute('placeholder') + text.charAt(i));
+          i++;
+          setTimeout(type, speed);
+        }
+      }
+      
+      type();
+    }
+    
+    // 页面加载完成后的动画效果
+    window.addEventListener('load', () => {
+      const placeholder = "在这里粘贴您的 HTML 代码...";
+      htmlInput.setAttribute('placeholder', '');
+      
+      setTimeout(() => {
+        typeWriter(htmlInput, placeholder, 30);
+      }, 800);
+    });
+  });
+</script>
