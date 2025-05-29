@@ -10,4 +10,4 @@ pages_build_output_dir = "dist"
 [[d1_databases]]
 binding = "DB"
 database_name = "html-go-db"
-database_id = "your-database-id-here"
+database_id = "2a5bd74e-ae8e-493e-9d26-9fd0a611ee20"
